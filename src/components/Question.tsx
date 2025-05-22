@@ -86,6 +86,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, timeLimit }) => {
           isComplete: false,
           showResult: false,
         })}
+        onLogout={() => {/* Add your logout logic here */}}
       />
     );
   }

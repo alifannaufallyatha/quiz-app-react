@@ -19,10 +19,11 @@ interface QuizProps {
   timeLimit: number; // in seconds
   timeSpent: number;
   onTryAgain: () => void;
-  
+  onLogout: () => void; // Add this line
 }
 
-const Quiz: React.FC<QuizProps> = ({ questions, timeLimit }) => {
+
+const Quiz: React.FC<QuizProps> = ({ questions, timeLimit, onLogout }) => {
   const [refreshKey, setRefreshKey] = useState(0); // Add this line
   const [state, setState] = useState<QuizState>(() => {
     const saved = loadQuizState();
@@ -68,6 +69,18 @@ const Quiz: React.FC<QuizProps> = ({ questions, timeLimit }) => {
     }));
   };
 
+  const handlePrevious = () => {
+  if (state.currentQuestion > 0) {
+    setState(prev => ({
+      ...prev,
+      currentQuestion: prev.currentQuestion - 1,
+      answers: prev.answers.slice(0, -1), // Remove the last answer
+      isComplete: false,
+      showResult: false
+    }));
+  }
+};
+
   const handleRetry = () => {
     setState({
       currentQuestion: 0,
@@ -88,43 +101,60 @@ const Quiz: React.FC<QuizProps> = ({ questions, timeLimit }) => {
     const actualTimeSpent = state.timeLeft <= 0 ? timeLimit : timeSpentSeconds;
     
     return (
-      <Result
-        score={state.score}
-        totalQuestions={questions.length}
-        answeredQuestions={state.answers.length}
-        timeSpent={actualTimeSpent}
-        onRetry={handleRetry}
-      />
+       <Result
+      score={state.score}
+      totalQuestions={questions.length}
+      answeredQuestions={state.answers.length}
+      timeSpent={actualTimeSpent}
+      onRetry={handleRetry}
+      onLogout={onLogout} // Pass the logout handler
+    />
     );
   }
 
   return (
     <div className="space-y-6 bg-white p-6 rounded-2xl shadow-xl">
-  <div className="flex justify-between items-center text-sm text-gray-600">
-    <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-semibold">
-      Question {state.currentQuestion + 1} / {questions.length}
+    <div className="flex justify-between items-center text-sm text-gray-600">
+      <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-semibold">
+        Question {state.currentQuestion + 1} / {questions.length}
+      </div>
+      <div className="bg-red-100 text-red-600 px-3 py-1 rounded-full font-semibold">
+        Time Left: {Math.floor(state.timeLeft / 60)}:{(state.timeLeft % 60).toString().padStart(2, '0')}
+      </div>
     </div>
-    <div className="bg-red-100 text-red-600 px-3 py-1 rounded-full font-semibold">
-      Time Left: {Math.floor(state.timeLeft / 60)}:{(state.timeLeft % 60).toString().padStart(2, '0')}
+
+    <div className="text-2xl font-semibold text-gray-800">
+      {questions[state.currentQuestion].question}
     </div>
-  </div>
 
-  <div className="text-2xl font-semibold text-gray-800">
-    {questions[state.currentQuestion].question}
-  </div>
+    <div className="grid grid-cols-1 gap-4">
+      {questions[state.currentQuestion].options.map((option) => (
+        <button
+          key={option}
+          onClick={() => handleAnswer(option)}
+          className="w-full text-left px-4 py-3 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 hover:from-blue-100 hover:to-blue-200 transition-all duration-200 font-medium text-gray-700 shadow-sm"
+        >
+          {option}
+        </button>
+      ))}
+    </div>
 
-  <div className="grid grid-cols-1 gap-4">
-    {questions[state.currentQuestion].options.map((option) => (
+    {/* Add navigation buttons */}
+    <div className="flex justify-between mt-4">
       <button
-        key={option}
-        onClick={() => handleAnswer(option)}
-        className="w-full text-left px-4 py-3 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 hover:from-blue-100 hover:to-blue-200 transition-all duration-200 font-medium text-gray-700 shadow-sm"
+        onClick={handlePrevious}
+        disabled={state.currentQuestion === 0}
+        className={`px-4 py-2 rounded-lg ${
+          state.currentQuestion === 0
+            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            : 'bg-blue-500 text-white hover:bg-blue-600'
+        } transition-colors duration-200`}
       >
-        {option}
+        Previous Question
       </button>
-    ))}
+      <div className="flex-grow"></div>
+    </div>
   </div>
-</div>
 
   );
   

@@ -34,6 +34,9 @@ A React-based quiz application built with TypeScript and Tailwind CSS that allow
   - Final score display
   - Retry functionality with timer reset
 
+- **Design**:
+  - Responsive can akses on mobile and desktop
+
 ## Tech Stack
 
 - React
@@ -49,6 +52,15 @@ A React-based quiz application built with TypeScript and Tailwind CSS that allow
 - Node.js (v14 or higher)
 - npm (v6 or higher)
 - Git
+
+## Local Storage
+
+The app uses browser's Local Storage to:
+- Save current quiz progress
+- Store user's answers
+- Maintain timer state
+- Enable quiz resumption after page refresh
+
 
 ### Installation Steps
 
@@ -85,28 +97,4 @@ npm start
 
 The application will open in your default browser at `http://localhost:3000`
 
-## Project Structure
 
-```
-quiz-app-react/
-├── src/
-│   ├── components/
-│   │   ├── Quiz.tsx
-│   │   └── Result.tsx
-│   ├── types/
-│   │   └── index.ts
-│   ├── utils/
-│   │   └── storage.ts
-│   └── App.tsx
-├── public/
-├── package.json
-└── tailwind.config.js
-```
-
-## Local Storage
-
-The app uses browser's Local Storage to:
-- Save current quiz progress
-- Store user's answers
-- Maintain timer state
-- Enable quiz resumption after page refresh
